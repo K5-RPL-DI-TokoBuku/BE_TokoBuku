@@ -6,13 +6,10 @@ let core = new midtransClient.CoreApi({
   clientKey: `${process.env.YOUR_CLIENT_KEY}`
 });
 
-
-
 class Transaction {
   static async sendChargeRequestToMidtrans(req, res, next) {
-    console.log("Server Key ichlas:", `${process.env.YOUR_SERVER_KEY}`);
+    console.log("Server Key:", `${process.env.YOUR_SERVER_KEY}`);
     let {payment_type, email, gross_amount, order_id} = req.body
-    // Sebenarnya isi parameter semuanya dari req.body cuma belum dipilih pilih
     let parameter = {
       payment_type,
       transaction_details: {
@@ -61,16 +58,14 @@ class Transaction {
         },
       },
     };
-
     try {
-      // charge transaction
       core
         .charge(parameter)
         .then((chargeResponse) => {
           console.log("chargeResponse:");
           console.log(chargeResponse);
           res.status(201).json({
-            message: "Success Charge, periksa log klo lo ga percaya! Bangsat",
+            message: "Success Charge, periksa log klo lo ga percaya! ",
             chargeResponse
           })
         })
@@ -80,8 +75,6 @@ class Transaction {
     } catch (err) {
       next(err)
     }
-
-    
   };
 }
 

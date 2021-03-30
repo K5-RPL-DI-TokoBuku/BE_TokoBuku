@@ -125,8 +125,16 @@ class ProductController {
       next(err)
     }
   }
-  // static async updateProduct(req, res, next) {}
-  // static async deleteProduct(req, res, next) {}
+  static async updateProduct(req, res, next) {
+    res.status(200).json({
+      message: "Success Update"
+    })
+  }
+  static async deleteProduct(req, res, next) {
+    res.status(200).json({
+      message: "Success Delete"
+    })
+  }
 }
 
 module.exports = ProductController;
