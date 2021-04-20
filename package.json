@@ -20,10 +20,13 @@
   "homepage": "https://github.com/K5-RPL-DI-TokoBuku/BE_TokoBuku#readme",
   "dependencies": {
     "axios": "^0.21.1",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
     "midtrans-client": "^1.2.2",
+    "mongoose": "^5.12.3",
     "nodemon": "^2.0.7"
   }
 }

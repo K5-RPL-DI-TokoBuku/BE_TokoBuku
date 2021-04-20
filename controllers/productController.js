@@ -1,9 +1,17 @@
+const {product} = require('../models/product');
+
 class ProductController {
   static async createProduct(req, res, next) {
     // Mesti ada header
-    let { name, author, category, image_link, price, quantity } = req.body
+    let { name, author, category, image_link, price, quantity, description } = req.body
+    let userData = {
+      name, author, category, image_link, price, quantity, description
+    }
+
     try {
-      if (name && category && image_link && price && quantity) {
+
+      const new_product = await product.create(userData);
+      if (new_product){
         res.status(201).json({
           status_code: 201,
           message: "Success Create New product",
@@ -13,83 +21,27 @@ class ProductController {
           image_link,
           price,
           quantity,
-          like: 0,
-          dislike: 0,
+          description
         })
       } else {
         throw { name: "Failed Create Product"}
       }
+      
+
     } catch (err) {
       next(err)
     }
   }
   static async readProducts(req, res, next) {
-    const dataProduct = [
-      {
-        name: "Codeigniter Basic",
-        author: "Ir Yuniar Supardi dan Ading Hermawan",
-        category: "Web Developer",
-        image_link:
-          "https://images.unsplash.com/photo-1593642634402-b0eb5e2eebc9?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-        price: 59000,
-        quantity: 10,
-      },
-      {
-        name: "Jaringan Komputer Dengan TCP/IP",
-        author: "Winarno Sugeng dan Theta Dinnarwaty Putri",
-        category: "Cyber Security",
-        image_link:
-          "https://images.unsplash.com/photo-1593642634402-b0eb5e2eebc9?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-        price: 59000,
-        quantity: 10,
-      },
-      {
-        name: "Certified Ethical hacker 100% illegal",
-        author: "Jasakom",
-        category: "Cyber Security",
-        image_link:
-          "https://images.unsplash.com/photo-1593642634402-b0eb5e2eebc9?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-        price: 59000,
-        quantity: 10,
-      },
-      {
-        name: "Certified Ethical hacker 400% illegal",
-        author: "Jasakom",
-        category: "Cyber Security",
-        image_link:
-          "https://images.unsplash.com/photo-1593642634402-b0eb5e2eebc9?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-        price: 59000,
-        quantity: 10,
-      },
-      {
-        name: "Fundamental Of Python For Machine Learning",
-        author: "Teguh Wahyono",
-        category: "Machine Learning",
-        image_link:
-          "https://images.unsplash.com/photo-1593642634402-b0eb5e2eebc9?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-        price: 59000,
-        quantity: 10,
-      },
-      {
-        name: "Kungfu Hacking dengan NMAP",
-        author: "Mr. Doel",
-        category: "Cyber Security",
-        image_link:
-          "https://images.unsplash.com/photo-1593642634402-b0eb5e2eebc9?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-        price: 59000,
-        quantity: 10,
-      },
-    ];
-
-    const totalDataProduct = dataProduct.length
-
     try {
-      if (dataProduct) {
+      const dataProduct = await product.find({})
+      if (dataProduct) {        
         res.status(200).json({
           statuc_code: 200,
-          total: totalDataProduct,
+          authorize_by: req.userLogin.name | 'Iklas',
           message: "Success get data produucts",
           products: dataProduct,
+
         });
       } else {
         throw { name: 'Data Products Not Found'}
@@ -100,23 +52,17 @@ class ProductController {
   }
   static async readDetailProduct(req, res, next) {
     const id = req.params.id
-    const product = {
-      id,
-      name: "Fundamental Of Python For Machine Learning",
-      author: "Teguh Wahyono",
-      category: "Machine Learning",
-      image_link:
-        "https://images.unsplash.com/photo-1593642634402-b0eb5e2eebc9?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
-      price: 59000,
-      quantity: 10,
-    }
+
 
     try {
-      if (product) {
+
+      const productExist = await product.findById(id)
+
+      if (productExist) {
         res.status(200).json({
           status_code: 200,
-          message: "Success get data product",
-          product
+          message: "Success get detail product",
+          data: productExist
         })
       } else {
         throw { name: 'Failed get data product'}
@@ -126,15 +72,101 @@ class ProductController {
     }
   }
   static async updateProduct(req, res, next) {
+    const id = req.params.id
     res.status(200).json({
       message: "Success Update"
     })
   }
   static async deleteProduct(req, res, next) {
-    res.status(200).json({
-      message: "Success Delete"
-    })
+    const id = req.params.id
+    console.log(id)
+
+    try {
+
+      const productExist = await product.findByIdAndDelete(id)
+      console.log(productExist)
+
+      if (productExist) {
+       
+        res.status(200).json({
+          message: "Success Delete",
+          data: productExist
+        })
+      } else {
+        throw { name: 'Failed delete data product'}
+      }
+    } catch (err) {
+      next(err)
+    }
   }
 }
 
 module.exports = ProductController;
+
+// const dataProduct = [
+    //   {
+    //     name: "Codeigniter Basic",
+    //     author: "Ir Yuniar Supardi dan Ading Hermawan",
+    //     category: "Web Developer",
+    //     image_link:
+    //       "https://images.unsplash.com/photo-1593642634402-b0eb5e2eebc9?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+    //     price: 59000,
+    //     quantity: 10,
+    //   },
+    //   {
+    //     name: "Jaringan Komputer Dengan TCP/IP",
+    //     author: "Winarno Sugeng dan Theta Dinnarwaty Putri",
+    //     category: "Cyber Security",
+    //     image_link:
+    //       "https://images.unsplash.com/photo-1593642634402-b0eb5e2eebc9?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+    //     price: 59000,
+    //     quantity: 10,
+    //   },
+    //   {
+    //     name: "Certified Ethical hacker 100% illegal",
+    //     author: "Jasakom",
+    //     category: "Cyber Security",
+    //     image_link:
+    //       "https://images.unsplash.com/photo-1593642634402-b0eb5e2eebc9?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+    //     price: 59000,
+    //     quantity: 10,
+    //   },
+    //   {
+    //     name: "Certified Ethical hacker 400% illegal",
+    //     author: "Jasakom",
+    //     category: "Cyber Security",
+    //     image_link:
+    //       "https://images.unsplash.com/photo-1593642634402-b0eb5e2eebc9?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+    //     price: 59000,
+    //     quantity: 10,
+    //   },
+    //   {
+    //     name: "Fundamental Of Python For Machine Learning",
+    //     author: "Teguh Wahyono",
+    //     category: "Machine Learning",
+    //     image_link:
+    //       "https://images.unsplash.com/photo-1593642634402-b0eb5e2eebc9?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+    //     price: 59000,
+    //     quantity: 10,
+    //   },
+    //   {
+    //     name: "Kungfu Hacking dengan NMAP",
+    //     author: "Mr. Doel",
+    //     category: "Cyber Security",
+    //     image_link:
+    //       "https://images.unsplash.com/photo-1593642634402-b0eb5e2eebc9?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+    //     price: 59000,
+    //     quantity: 10,
+    //   },
+    // ];
+
+        // const product = {
+    //   id,
+    //   name: "Fundamental Of Python For Machine Learning",
+    //   author: "Teguh Wahyono",
+    //   category: "Machine Learning",
+    //   image_link:
+    //     "https://images.unsplash.com/photo-1593642634402-b0eb5e2eebc9?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+    //   price: 59000,
+    //   quantity: 10,
+    // }
