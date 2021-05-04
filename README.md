@@ -1,11 +1,68 @@
-*REST API*
+API DOC
 
-Link:
-Login
-Register
-CreateProduct
-Get Products
-Get Product
+**User Register**
+----
+  Returns json data about a new user.
+
+* **URL**
+
+  /auth/register
+
+* **Method:**
+
+  `POST`
+  
+*  **URL Params**
+
+   **Required:**
+ 
+   `None`
+
+* **Data Params**
+
+    `email=['String']`
+
+    `Password=['String']`
+
+    `Name=['String']`
+
+    `Nik=['Integer']`
+
+* **Success Response:**
+
+  * **Code:** 201 <br />
+    **Content:** `
+
+    
+
+    
+    {
+
+        "status_code": 201,
+
+        "message": "Success Create New product",
+
+        "name": "Modul praktikum Jaringan Komputer",
+
+        "author": "IF LAB",
+
+        "category": "Cyber Security",
+
+        "image_link": "https://images.unsplash.com/photo-1593642634402-b0eb5e2eebc9?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+
+        "price": "50000",
+
+        "quantity": "10",
+
+        "description": "Not for sale"
+    }
+`
+ 
+* **Error Response:**
+
+  * **Code:** 500 NOT FOUND <br />
+    **Content:** `{ error : "ValidationError" }`
+
 
 **Create Product**
 ----
