@@ -2,19 +2,21 @@ const {product} = require('../models/product');
 
 class ProductController {
   static async createProduct(req, res, next) {
-    // Mesti ada header
-    let { name, author, category, image_link, price, quantity, description } = req.body
+    // Menginisiasi CreateProdut
+    let { name, author, category, image_link, price, quantity, description } = req.body  // nama, penulis, kategori, gambr, harga, jumlah, deskripsi
     let userData = {
       name, author, category, image_link, price, quantity, description
     }
 
     try {
 
+      // Membuat user data baru ke database dan di inisiasi ke new product 
       const new_product = await product.create(userData);
+      // jika berhasil kirim data ke user jika gagal teruskan pesan failed
       if (new_product){
         res.status(201).json({
           status_code: 201,
-          message: "Success Create New product",
+          message: "Success Create New product", // 
           name,
           author,
           category,
@@ -54,9 +56,9 @@ class ProductController {
 
 
     try {
-
+// Mencari product Id ke database lalu di inisiasi ke product Exist
       const productExist = await product.findById(id)
-
+// Jika berhasil kirim data json ke user jika gagal teruskan pesan error
       if (productExist) {
         res.status(200).json({
           status_code: 200,
@@ -70,6 +72,8 @@ class ProductController {
       next(err)
     }
   }
+
+  // Untuk memperbarui product
   static async updateProduct(req, res, next) {
     const id = req.params.id
     res.status(200).json({
@@ -81,14 +85,14 @@ class ProductController {
     console.log(id)
 
     try {
-
+// Mencari product Id dan Delete ke database lalu di inisiasi ke product Exist
       const productExist = await product.findByIdAndDelete(id)
       console.log(productExist)
-
+// Jika berhasil kirim data json ke user jika gagal teruskan pesan error
       if (productExist) {
        
         res.status(200).json({
-          message: "Success Delete",
+          message: "Success Delete",    
           data: productExist
         })
       } else {
