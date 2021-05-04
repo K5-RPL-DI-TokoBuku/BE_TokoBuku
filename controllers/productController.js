@@ -38,7 +38,6 @@ class ProductController {
       if (dataProduct) {        
         res.status(200).json({
           statuc_code: 200,
-          authorize_by: req.userLogin.name | 'Iklas',
           message: "Success get data produucts",
           products: dataProduct,
 

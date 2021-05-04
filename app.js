@@ -29,5 +29,5 @@ app.use("/", routes);
 app.use(errorHandler);
 
 app.listen(port, () => {
-  console.log(`App running at http://localhost:${port}`);
+  console.log(`App running at http://127.0.0.1:${port}`);
 });

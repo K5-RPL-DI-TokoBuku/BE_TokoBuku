@@ -5,7 +5,7 @@ const ProductController = require("../controllers/productController");
 const { authentication, isAdmin } = require('../midlewares/auth')
 
 
-router.get("/all", authentication, ProductController.readProducts);
+router.get("/all", ProductController.readProducts);
 router.get("/:id", ProductController.readDetailProduct);
 
 // Authentication, hannya yang memiliki token atau sudah login yang bisa melakukan task dibawah ini

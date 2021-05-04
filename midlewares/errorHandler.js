@@ -28,7 +28,8 @@ const errorHandler = (err, req, res, next) => {
     default:
       console.log(err.name);
       res.status(500).json({
-        error: "Internal Server Error",
+
+        error: err.name,
       });
   }
 };
