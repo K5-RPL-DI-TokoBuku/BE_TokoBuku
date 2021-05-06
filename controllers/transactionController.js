@@ -6,6 +6,9 @@ let core = new midtransClient.CoreApi({
   clientKey: `${process.env.YOUR_CLIENT_KEY}`
 });
 
+const {transaksi} = require('../models/transaksi');
+
+
 class Transaction {
   static async sendChargeRequestToMidtrans(req, res, next) {
     console.log("Server Key:", `${process.env.YOUR_SERVER_KEY}`);
@@ -76,6 +79,94 @@ class Transaction {
       next(err)
     }
   };
+
+  static async createTransaksi(req,res,next){
+    // id_user: mongoose.isValidObjectId,
+    // status_pembayaran: boolean,
+    // total_pembayaran: Number,
+    // berat: Number,
+    // date: { type: Date, default: Date.now },
+    // detail_transaksi: [{id_product: mongoose.isValidObjectId, jumlah_product: Number}]
+
+  //   {
+  //     id_user: '60759a6daa2e7c3a6c3675cb',
+  //     status_pembayaran: 'false',
+  //     detail_transaksi: [
+  //         {
+  //             id_product: '6076b0c1301b193234e19870', jumlah_product: 2
+  //         },
+  //         {
+  //             id_product: '6076cf3aa196bf31a0149729', jumlah_product: 2
+  //         },
+  //     ] ,
+  //     total_pemabayaran: 218000,
+  //     berat: 2,
+  // }
+
+    let {id_user, status_pembayaran, total_pembayaran, berat, detail_transaksi} = req.body
+
+    let post_data = {
+      id_user, 
+      status_pembayaran, 
+      total_pembayaran, 
+      berat, 
+      detail_transaksi
+    }
+
+    try {
+      const new_transaksi = await transaksi.create(post_data)
+      res.status(201).json({
+        message: 'Success Create transaksi'
+      })
+
+    } catch(err) {
+      next(err)
+    }
+  }
+
+  static async readTransactions(req,res,next){
+    try {
+      const all = await transaksi.find({})
+      res.status(200).json({
+        msg: 'Find All transaksi',
+        response: all
+      })
+    } catch(err){
+      console.log(err)
+    }
+  }
+
+  static async readTransactionsById(req,res,next){
+    // console.log(req.params)
+    // res.status(200).json({
+    //   msg: 'Oke'
+    // })
+    try{
+      const detail = await transaksi.findById(req.params.id)
+      res.status(200).json({
+        msg: 'Get Detail Transaksi',
+        response: detail
+      })
+
+    } catch(err){
+      console.log(err)
+    }
+  }
+
+
+  static async deleteTransaction(req, res,next){
+    try{
+      const transactionExist = await transaksi.findByIdAndRemove(req.params.id)
+      res.status(200).json({
+        msg: 'Berhasil delete transaction',
+        response: transactionExist
+      }) 
+
+
+    } catch(err){
+      console.log(err)
+    }
+  }
 }
 
 module.exports = Transaction;
