@@ -7,20 +7,28 @@ const {user} = require('../models/user')
 class UserController {
   static async postRegister(req, res, next) {
     let { email, password, name, nik } = req.body;
+    console.log(req.body)
     const new_pass = hashPassword(password)
+    console.log(new_pass)
     let newUser = {
       email, password: new_pass, name, nik
     }
+    console.log("New")
+    console.log(newUser)
+
     try {
       const regis_user = await user.create(newUser)
       if (regis_user){
+        console.log(regis_user)
         res.status(201).json({
           status_code: 201,
           message: "Register User Success",
           email,
-          name
+          name,
+        
         });
       } else {
+        console.log('Error Regis user')
         throw { name: "Register User Failed" };
       }
     } catch (err) {
@@ -76,6 +84,90 @@ class UserController {
         throw { name: "User doesnt exist or wrong password" };
       }
     } catch (err) {
+      next(err);
+    }
+  }
+
+  static async getCart(req,res,next){
+    const {email, cart, name} = req.userLogin
+    res.status(200).json({msg : 'OK',name, email, cart: cart})
+  }
+
+  static async addToCart(req,res,next){
+    const {email, cart} = req.userLogin
+    let { name, author, category, image_link, price, quantity, description } = req.body 
+    let new_product = {
+      name, author, category, image_link, price, quantity, description
+    }
+    const new_cart = cart
+    new_cart.push(new_product)
+    console.log('Email :' , email)
+    console.log(new_cart)
+
+    try{
+      // res.json({msg: 'Hello', cart: new_cart})
+      const add = await user.findOneAndUpdate(email, {cart: new_cart})
+
+      
+      if(add){
+        res.status(201).json({
+          message: 'Berhasil Add to cart',
+          add
+        })
+      } else {
+        console.log("Error add " , add)
+        res.status(400).json({
+          message: 'Gagal add to cart',
+          add
+        })
+      }
+      
+    }catch(err){
+      console.log(err)
+      next(err);
+    }
+  }
+
+  static async deleteFromCart(req,res,next){
+    const {id_product} = req.body
+    const {email, cart} = req.userLogin
+    // console.log(id_product)
+    // console.log(cart[0].id)
+
+    // for(let i=0; i<cart.length; i++){
+    //   if(id_product == cart[i].id){
+    //     console.log('Sama')
+    //   } else {
+    //     console.log('Tidak Sama')
+
+    //   }
+    // }
+
+    const removecart = cart.filter(e => e.id != id_product)
+    // console.log(removecart.length)
+
+    // res.json({msg: 'Hai', id_product, email,  'cart': removecart})
+
+    try{
+      if(removecart){
+        const delete_product_from_cart = await user.findOneAndUpdate(email, {cart: removecart})
+        if (delete_product_from_cart){
+
+          res.status(201).json({
+            message: 'Berhasil Delete product from cart',
+            new: removecart.length,
+          })
+        } else {
+          res.status(201).json({
+            message: 'Gagal Delete product from cart',
+            delete_product_from_cart
+          })
+        }
+
+      } else {
+        console.log('Tidak ada yg di remove')
+      }
+    }catch(err){
       next(err);
     }
   }

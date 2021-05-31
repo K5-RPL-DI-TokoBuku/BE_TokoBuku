@@ -3,6 +3,7 @@ const { verifyToken } = require('../helpers/jwt')
 
 async function authentication(req, res, next) {
   const token = req.headers.token
+  console.log(req.headers.token, "909")
   try {
     if (!token) {
       res.status(401).json({
@@ -34,8 +35,6 @@ async function authentication(req, res, next) {
     next(err)
   }
 }
-
-
 
 async function isAdmin(req, res, next) {
 //   const id = req.params.id

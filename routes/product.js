@@ -10,9 +10,9 @@ router.get("/:id", ProductController.readDetailProduct);
 
 // Authentication, hannya yang memiliki token atau sudah login yang bisa melakukan task dibawah ini
 // Authorization, hannya admin yang bisa melakukan task dibawah ini
-router.post("/create", isAdmin, ProductController.createProduct);
-router.delete("/:id", authentication, isAdmin, ProductController.deleteProduct);
-router.put("/:id", authentication, isAdmin, ProductController.updateProduct);
+router.post("/create", ProductController.createProduct);
+router.delete("/:id", authentication, ProductController.deleteProduct);
+router.put("/:id", authentication, ProductController.updateProduct);
 
 
 

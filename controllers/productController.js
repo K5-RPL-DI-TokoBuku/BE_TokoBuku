@@ -3,6 +3,8 @@ const {product} = require('../models/product');
 class ProductController {
   static async createProduct(req, res, next) {
     // Menginisiasi CreateProdut
+    console.log('post product')
+    console.log(req.body.name)
     let { name, author, category, image_link, price, quantity, description } = req.body  // nama, penulis, kategori, gambr, harga, jumlah, deskripsi
     let userData = {
       name, author, category, image_link, price, quantity, description
@@ -34,6 +36,7 @@ class ProductController {
       next(err)
     }
   }
+
   static async readProducts(req, res, next) {
     try {
       const dataProduct = await product.find({})
@@ -51,6 +54,7 @@ class ProductController {
       next(err)
     }
   }
+
   static async readDetailProduct(req, res, next) {
     const id = req.params.id
 
@@ -73,13 +77,23 @@ class ProductController {
     }
   }
 
-  // Untuk memperbarui product
   static async updateProduct(req, res, next) {
     const id = req.params.id
-    res.status(200).json({
-      message: "Success Update"
-    })
+    let { name, author, category, image_link, price, quantity, description } = req.body
+    const update = await product.findOneAndUpdate(id, { name, author, category, image_link, price, quantity, description })
+    if (update ){
+      res.status(200).json({
+        message: "Success Update"
+      })
+    } else {
+      res.status(200).json({
+        message: "Update Failed"
+      })
+    }
+    
+    
   }
+  
   static async deleteProduct(req, res, next) {
     const id = req.params.id
     console.log(id)
@@ -105,6 +119,32 @@ class ProductController {
 }
 
 module.exports = ProductController;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // const dataProduct = [
     //   {

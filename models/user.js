@@ -1,3 +1,4 @@
+const { productSchema} = require('./product')
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -19,6 +20,7 @@ let userSchema = new Schema({
         type: String,
         required: true,
     },
+    cart: [productSchema]
 },{
     timestamps: true
 })
