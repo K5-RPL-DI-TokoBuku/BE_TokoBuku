@@ -11,7 +11,6 @@ class ProductController {
     }
 
     try {
-
       // Membuat user data baru ke database dan di inisiasi ke new product 
       const new_product = await product.create(userData);
       // jika berhasil kirim data ke user jika gagal teruskan pesan failed

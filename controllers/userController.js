@@ -1,7 +1,6 @@
 const {hashPassword, comparePassword} = require('../helpers/bcrypt');
 const { signToken } = require('../helpers/jwt');
 const mongoose = require('mongoose');
-
 const {user} = require('../models/user')
 
 class UserController {
@@ -36,7 +35,6 @@ class UserController {
     }
   }
 
-
   static async readUsers(req,res,next){
     try{
       const users = await user.find({})
@@ -53,7 +51,6 @@ class UserController {
     }
   }
 
-
   static async postLogin(req, res, next) {
 
     // console.log(req.body)
@@ -66,23 +63,32 @@ class UserController {
       const userExist = await user.findOne({email})
       // console.log(userExist.password)
       // console.log('45')
+
+
+
       if (userExist && comparePassword(password, userExist.password)){
+
         const payload = {
           user: userExist.name,
           email: userExist.email,
           userID: userExist._id
         }
         const token = signToken(payload)
+
         res.status(200).json({
           message: 'Berhasil Login',
           user: payload.user,
           ID: userExist._id,
           token
         })
+
       } else {
-        // console.log("iklas")
         throw { name: "User doesnt exist or wrong password" };
       }
+
+
+
+
     } catch (err) {
       next(err);
     }
