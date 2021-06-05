@@ -3,7 +3,8 @@ const { verifyToken } = require('../helpers/jwt')
 
 async function authentication(req, res, next) {
   const token = req.headers.token
-  console.log(req.headers.token, "909")
+
+  console.log(typeof token)
   try {
     if (!token) {
       res.status(401).json({

@@ -102,28 +102,48 @@ class UserController {
   static async addToCart(req,res,next){
     const {email, cart} = req.userLogin
     let { name, author, category, image_link, price, quantity, description } = req.body 
+
     let new_product = {
       name, author, category, image_link, price, quantity, description
     }
-    const new_cart = cart
-    new_cart.push(new_product)
-    console.log('Email :' , email)
-    console.log(new_cart)
+    
+    let new_cart = cart
+
+    let update = false
+
+    for (let i=0; i< cart.length;i++){
+      if ( cart[i]['name'] == name){
+        new_cart[i]['quantity'] += 1
+        update = true
+      }
+    }
+
+    if (!update){
+      new_cart.push(new_product)
+    } else {
+      console.log('Just add quantity')
+    }
+
+    
 
     try{
       // res.json({msg: 'Hello', cart: new_cart})
       const add = await user.findOneAndUpdate(email, {cart: new_cart})
-
+      let message = 'Success Add to cart'
+      
+      if (update){
+        message = 'Add Quantity Product in cart'
+      }
       
       if(add){
         res.status(201).json({
-          message: 'Berhasil Add to cart',
+          message,
           add
         })
       } else {
         console.log("Error add " , add)
         res.status(400).json({
-          message: 'Gagal add to cart',
+          message: 'Failed add to cart',
           add
         })
       }
