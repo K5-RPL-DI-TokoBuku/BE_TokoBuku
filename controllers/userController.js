@@ -51,6 +51,13 @@ class UserController {
     }
   }
 
+  static async readUserData(req, res,next) {
+    res.status(200).json({
+      message: 'OKE',
+      dataUser: req.userLogin
+    })
+  }
+
   static async postLogin(req, res, next) {
 
     // console.log(req.body)
@@ -194,6 +201,33 @@ class UserController {
         console.log('Tidak ada yg di remove')
       }
     }catch(err){
+      next(err);
+    }
+  }
+
+  static async updateAddresUser(req,res,next){
+    const {email} = req.userLogin
+    let { label_alamat, nama_penerima,nomor_telepon,kota_kecamatan,kode_pos,alamat } = req.body 
+    console.log('Ini req body\n', req.body)
+    
+
+    try{
+      let new_userData = await user.findOneAndUpdate(email, {alamat_pengiriman: {label_alamat, nama_penerima,nomor_telepon,kota_kecamatan,kode_pos,alamat}}, {returnOriginal: false})
+      if(new_userData){
+        console.log('Ini hasil dari db\n',new_userData )
+
+        res.status(201).json({
+          new_userData
+        })
+      } else {
+        console.log("Error new_address ", new_userData)
+        res.status(400).json({
+          message: 'Failed updated new address',
+          new_userData
+        })
+      }
+    } catch(err){
+      console.log(err)
       next(err);
     }
   }
