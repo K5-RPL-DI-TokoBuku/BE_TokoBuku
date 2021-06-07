@@ -79,7 +79,7 @@ class ProductController {
   static async updateProduct(req, res, next) {
     const id = req.params.id
     let { name, author, category, image_link, price, quantity, description } = req.body
-    const update = await product.findOneAndUpdate(id, { name, author, category, image_link, price, quantity, description })
+    const update = await product.findOneAndUpdate(id, { name, author, category, image_link, price, quantity, description }, {})
     if (update ){
       res.status(200).json({
         message: "Success Update"

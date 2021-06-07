@@ -1,7 +1,7 @@
 const {hashPassword, comparePassword} = require('../helpers/bcrypt');
 const { signToken } = require('../helpers/jwt');
-const mongoose = require('mongoose');
 const {user} = require('../models/user')
+
 
 class UserController {
   static async postRegister(req, res, next) {
@@ -10,7 +10,15 @@ class UserController {
     const new_pass = hashPassword(password)
     console.log(new_pass)
     let newUser = {
-      email, password: new_pass, name, nik
+      email, password: new_pass, name, nik, alamat_pengiriman: {
+        'label_alamat': 'Rumah',
+        'kota_kecamatan': 'Bandung',
+        'kode_pos': 23764,
+        'nomor_telepon': 123456723,
+        'alamat': 'Not Set'
+
+
+      }
     }
     console.log("New")
     console.log(newUser)
@@ -22,12 +30,11 @@ class UserController {
         res.status(201).json({
           status_code: 201,
           message: "Register User Success",
-          email,
-          name,
+          regis_user
         
         });
       } else {
-        console.log('Error Regis user')
+        console.log('Error Regis user\n', regis_user)
         throw { name: "Register User Failed" };
       }
     } catch (err) {
@@ -109,12 +116,16 @@ class UserController {
   static async addToCart(req,res,next){
     const {email, cart} = req.userLogin
     let { name, author, category, image_link, price, quantity, description } = req.body 
+    console.log(`Email : ${email}, cart : ${cart}`)
+
+    console.log(`request from body : ${req.body['name']}`)
 
     let new_product = {
       name, author, category, image_link, price, quantity, description
     }
     
     let new_cart = cart
+    console.log("New cart : ", new_cart)
 
     let update = false
 
@@ -135,17 +146,19 @@ class UserController {
 
     try{
       // res.json({msg: 'Hello', cart: new_cart})
-      const add = await user.findOneAndUpdate(email, {cart: new_cart})
+      const add = await user.findOneAndUpdate({email}, {cart: new_cart}, {returnOriginal: false})
       let message = 'Success Add to cart'
+      
       
       if (update){
         message = 'Add Quantity Product in cart'
       }
       
       if(add){
+        console.log('Hasil Add :\n', add)
         res.status(201).json({
           message,
-          add
+          result : add
         })
       } else {
         console.log("Error add " , add)
@@ -164,26 +177,12 @@ class UserController {
   static async deleteFromCart(req,res,next){
     const {id_product} = req.body
     const {email, cart} = req.userLogin
-    // console.log(id_product)
-    // console.log(cart[0].id)
-
-    // for(let i=0; i<cart.length; i++){
-    //   if(id_product == cart[i].id){
-    //     console.log('Sama')
-    //   } else {
-    //     console.log('Tidak Sama')
-
-    //   }
-    // }
 
     const removecart = cart.filter(e => e.id != id_product)
-    // console.log(removecart.length)
-
-    // res.json({msg: 'Hai', id_product, email,  'cart': removecart})
 
     try{
       if(removecart){
-        const delete_product_from_cart = await user.findOneAndUpdate(email, {cart: removecart})
+        const delete_product_from_cart = await user.findOneAndUpdate({email}, {cart: removecart}, {returnOriginal: false})
         if (delete_product_from_cart){
 
           res.status(201).json({
@@ -207,16 +206,31 @@ class UserController {
 
   static async updateAddresUser(req,res,next){
     const {email} = req.userLogin
-    let { label_alamat, nama_penerima,nomor_telepon,kota_kecamatan,kode_pos,alamat } = req.body 
-    console.log('Ini req body\n', req.body)
-    
+    const { label_alamat, nama_penerima,nomor_telepon,kota_kecamatan,kode_pos,alamat } = req.body 
+    console.log('Reques from Body :\n', req.body)
+    console.log(`Email From User Login : ${email}`)
 
-    try{
-      let new_userData = await user.findOneAndUpdate(email, {alamat_pengiriman: {label_alamat, nama_penerima,nomor_telepon,kota_kecamatan,kode_pos,alamat}}, {returnOriginal: false})
+    const alamat_pengiriman = {
+      label_alamat, 
+      nama_penerima,
+      nomor_telepon,
+      kota_kecamatan,
+      kode_pos,
+      alamat
+    }
+    
+    try{     
+      let new_userData = await user.findOneAndUpdate(
+          {email},
+          {alamat_pengiriman}, 
+          {returnOriginal: false}
+        )
+
       if(new_userData){
-        console.log('Ini hasil dari db\n',new_userData )
 
         res.status(201).json({
+          email,
+          label_alamat: req.body['label_alamat'],
           new_userData
         })
       } else {
@@ -231,5 +245,38 @@ class UserController {
       next(err);
     }
   }
+
+  static async checkOngkir(req,res,next){
+    const {origin, destination, weight, courier} = req.body
+    try {
+      // Fet Api 3rd Raja Ongkir
+      const url = 'https://api.rajaongkir.com/starter/cost'
+      fetch(url,{
+        method: 'POST',
+        headers: {
+          key: process.env.KEY_RAJA_ONGKIR
+        },
+        body: JSON.stringify({origin, destination, weight, courier})
+      }).then(response => {
+        console.log(response)
+        res.status(200).json({
+          message: 'OK',
+          response
+        })
+      }).catch((err)=>{
+        next(err)
+      })
+
+    } catch(err){
+      console.log(err)
+    }
+
+    res.status(200).json()
+  }
 }
+
+
+
+
+
 module.exports = UserController;

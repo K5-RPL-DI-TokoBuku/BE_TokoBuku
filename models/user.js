@@ -2,14 +2,14 @@ const { productSchema} = require('./product')
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-let alamatPengirimanSchema = new Schema({
-    label_alamat:  String,
-    nama_penerima: String,
-    nomor_telepon:   Number,
-    kota_kecamatan: String,
-    kode_pos: Number,
-    alamat: String,
-  });
+// let alamatPengirimanSchema = new Schema({
+//     label_alamat:  String,
+//     nama_penerima: String,
+//     nomor_telepon:   Number,
+//     kota_kecamatan: String,
+//     kode_pos: Number,
+//     alamat: String,
+//   });
 
 let userSchema = new Schema({
     name: {
@@ -30,7 +30,13 @@ let userSchema = new Schema({
         required: true,
     },
     cart: [productSchema],
-    alamat_pengiriman: [alamatPengirimanSchema]
+    alamat_pengiriman: {
+        label_alamat:  String,
+        nama_penerima: String,
+        nomor_telepon:   Number,
+        kota_kecamatan: String,
+        kode_pos: Number,
+        alamat: String}
 },{
     timestamps: true
 })

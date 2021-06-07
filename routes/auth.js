@@ -13,5 +13,6 @@ router.put('/delete_from_cart', authentication, UserController.deleteFromCart);
 router.get('/cart', authentication, UserController.getCart);
 router.get('/userdata', authentication, UserController.readUserData);
 router.put('/user_address', authentication, UserController.updateAddresUser);
+router.post('/check_ongkir', UserController.checkOngkir);
 
 module.exports = router;

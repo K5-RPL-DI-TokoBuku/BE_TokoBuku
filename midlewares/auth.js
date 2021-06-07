@@ -3,10 +3,9 @@ const { verifyToken } = require('../helpers/jwt')
 
 async function authentication(req, res, next) {
   const token = req.headers.token
-
-  console.log(typeof token)
   try {
     if (!token) {
+      console.log("User doesnt have token!")
       res.status(401).json({
         statuc_code: 401,
         message: "Not Authorized",
@@ -15,20 +14,22 @@ async function authentication(req, res, next) {
       
     } else {
       const payload = verifyToken(token)
-      console.log(payload)
       if (payload){
-        console.log("ada payload")
+        console.log("Token Exist and Succes To verify")
+        console.log(`Name: ${payload.user} & Email : ${payload.email} Try ro find in database`)
         const userExist = await user.find({email: payload.email})
 
         if (!userExist) {  
+          console.log(`Name: ${payload.user} & Email : ${paylaod.email} Doesnt exist in database`)
           throw { name: "Your token Invalid"}
         } else { 
-          console.log("lol", userExist)
+          console.log(`Name: ${payload.user} & Email : ${payload.email} Exist in database`)
           req.userLogin = userExist[0]
           next()
         }
       } else {
-        throw { name: "Gagal memiliki payload"}
+        console.log("Token Exist but Failed To verify")
+        throw { name: "Failed to verify token."}
       }
     }
   } catch (err) {
