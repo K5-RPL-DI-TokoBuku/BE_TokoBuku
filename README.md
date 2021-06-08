@@ -1,5 +1,36 @@
 API DOC
 
+List Routes :
+
+
+
+  {
+
+        Name  | URL Link
+        Login
+        Register
+        Update Profile
+        Show Products
+        Show Detail Product
+        Add product
+        Update Product
+        Delete Product
+        Add To cart 
+        Create Transaksi
+        Get Transaksi
+        Update Transaksi
+        Get Pembayaran 
+        Check Ongkir
+
+        14 Test Case Problem
+
+  }
+        
+
+
+
+
+
 **User Register**
 ----
   Returns json data about a new user.

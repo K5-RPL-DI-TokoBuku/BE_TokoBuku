@@ -1,6 +1,8 @@
 const {hashPassword, comparePassword} = require('../helpers/bcrypt');
 const { signToken } = require('../helpers/jwt');
 const {user} = require('../models/user')
+const axios = require('axios');
+
 
 
 class UserController {
@@ -272,6 +274,41 @@ class UserController {
     }
 
     res.status(200).json()
+  }
+
+  static async getCityInProvince(req,res,next){
+    const {province} = req.body
+    // res.status(200).json({
+    //   // result,
+    //   province,
+    //   msg: `https://api.rajaongkir.com/starter/city?province=${province}`
+    // })
+    try{
+      axios
+        .get(`https://api.rajaongkir.com/starter/city?province=${province}`,{
+            qs: {province},
+            headers: {
+                key: 'd250cda4c7582091070daf9556d4b40d'
+            },
+        })
+        .then((result) => {
+            console.log('Result from raja ongkir')
+
+            res.status(200).json({
+              // result,
+              url: `https://api.rajaongkir.com/starter/city?province=${province}`,
+              result
+            })
+        })
+        .catch(err=>{
+            console.log(err)
+        })
+        .finally(()=>{
+            console.log('Fetch city in province , to raja ongkir API')
+        })
+    }catch(err){
+      next(err)
+    }
   }
 }
 

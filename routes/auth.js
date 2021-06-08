@@ -14,5 +14,6 @@ router.get('/cart', authentication, UserController.getCart);
 router.get('/userdata', authentication, UserController.readUserData);
 router.put('/user_address', authentication, UserController.updateAddresUser);
 router.post('/check_ongkir', UserController.checkOngkir);
+router.post('/get_city_in_province', UserController.getCityInProvince);
 
 module.exports = router;
