@@ -1,16 +1,13 @@
 const {hashPassword, comparePassword} = require('../helpers/bcrypt');
 const { signToken } = require('../helpers/jwt');
 const {user} = require('../models/user')
-const axios = require('axios');
-
-
 
 class UserController {
   static async postRegister(req, res, next) {
     let { email, password, name, nik } = req.body;
-    console.log(req.body)
+    // console.log(req.body)
     const new_pass = hashPassword(password)
-    console.log(new_pass)
+    // console.log(new_pass)
     let newUser = {
       email, password: new_pass, name, nik, alamat_pengiriman: {
         'label_alamat': 'Rumah',
@@ -22,13 +19,13 @@ class UserController {
 
       }
     }
-    console.log("New")
-    console.log(newUser)
+    // console.log("New")
+    // console.log(newUser)
 
     try {
       const regis_user = await user.create(newUser)
       if (regis_user){
-        console.log(regis_user)
+        // console.log(regis_user)
         res.status(201).json({
           status_code: 201,
           message: "Register User Success",
@@ -36,7 +33,7 @@ class UserController {
         
         });
       } else {
-        console.log('Error Regis user\n', regis_user)
+        // console.log('Error Regis user\n', regis_user)
         throw { name: "Register User Failed" };
       }
     } catch (err) {
@@ -276,40 +273,6 @@ class UserController {
     res.status(200).json()
   }
 
-  static async getCityInProvince(req,res,next){
-    const {province} = req.body
-    // res.status(200).json({
-    //   // result,
-    //   province,
-    //   msg: `https://api.rajaongkir.com/starter/city?province=${province}`
-    // })
-    try{
-      axios
-        .get(`https://api.rajaongkir.com/starter/city?province=${province}`,{
-            qs: {province},
-            headers: {
-                key: 'd250cda4c7582091070daf9556d4b40d'
-            },
-        })
-        .then((result) => {
-            console.log('Result from raja ongkir')
-
-            res.status(200).json({
-              // result,
-              url: `https://api.rajaongkir.com/starter/city?province=${province}`,
-              result
-            })
-        })
-        .catch(err=>{
-            console.log(err)
-        })
-        .finally(()=>{
-            console.log('Fetch city in province , to raja ongkir API')
-        })
-    }catch(err){
-      next(err)
-    }
-  }
 }
 
 

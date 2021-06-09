@@ -10,6 +10,12 @@ class ProductController {
       name, author, category, image_link, price, quantity, description
     }
 
+    if(!name && !author && !category && !image_link && !price && !quantity && !description){
+      throw({name: "Unpitan not valid"})
+
+      
+    } 
+
     try {
       // Membuat user data baru ke database dan di inisiasi ke new product 
       const new_product = await product.create(userData);
@@ -57,6 +63,10 @@ class ProductController {
   static async readDetailProduct(req, res, next) {
     const id = req.params.id
 
+    if(!id){
+      throw({name: "Id Not valid"})
+    }
+
 
     try {
 // Mencari product Id ke database lalu di inisiasi ke product Exist
@@ -79,16 +89,28 @@ class ProductController {
   static async updateProduct(req, res, next) {
     const id = req.params.id
     let { name, author, category, image_link, price, quantity, description } = req.body
-    const update = await product.findOneAndUpdate(id, { name, author, category, image_link, price, quantity, description }, {})
-    if (update ){
-      res.status(200).json({
-        message: "Success Update"
-      })
-    } else {
-      res.status(200).json({
-        message: "Update Failed"
-      })
+
+    if ( !name && !author && !category && !image_link && !price && !quantity && !description){
+      throw({name: "Inputan Not valid"})
+
     }
+    try{
+      const update = await product.findOneAndUpdate(id, { name, author, category, image_link, price, quantity, description }, {})
+      if (update ){
+        res.status(200).json({
+          message: "Success Update"
+        })
+      } else {
+        res.status(200).json({
+          message: "Update Failed"
+        })
+      }
+
+    } catch(err){
+      next(err)
+    }
+
+    
     
     
   }
@@ -96,6 +118,11 @@ class ProductController {
   static async deleteProduct(req, res, next) {
     const id = req.params.id
     console.log(id)
+
+    if (!id){
+      throw({name: "Id Not valid"})
+
+    }
 
     try {
 // Mencari product Id dan Delete ke database lalu di inisiasi ke product Exist

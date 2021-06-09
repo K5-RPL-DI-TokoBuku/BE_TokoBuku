@@ -8,11 +8,17 @@ let core = new midtransClient.CoreApi({
 
 const {transaksi} = require('../models/transaksi');
 
+const axios = require('axios');
+const FormData = require('form-data');
 
 class Transaction {
   static async sendChargeRequestToMidtrans(req, res, next) {
     console.log("Server Key:", `${process.env.YOUR_SERVER_KEY}`);
     let {payment_type, email, gross_amount, order_id} = req.body
+
+    if(!payment_type && !email && !gross_amount && !order_id){
+      throw({name: 'Input failed'})
+    }
     let parameter = {
       payment_type,
       transaction_details: {
@@ -81,27 +87,6 @@ class Transaction {
   };
 
   static async createTransaksi(req,res,next){
-    // id_user: mongoose.isValidObjectId,
-    // status_pembayaran: boolean,
-    // total_pembayaran: Number,
-    // berat: Number,
-    // date: { type: Date, default: Date.now },
-    // detail_transaksi: [{id_product: mongoose.isValidObjectId, jumlah_product: Number}]
-
-  //   {
-  //     id_user: '60759a6daa2e7c3a6c3675cb',
-  //     status_pembayaran: 'false',
-  //     detail_transaksi: [
-  //         {
-  //             id_product: '6076b0c1301b193234e19870', jumlah_product: 2
-  //         },
-  //         {
-  //             id_product: '6076cf3aa196bf31a0149729', jumlah_product: 2
-  //         },
-  //     ] ,
-  //     total_pemabayaran: 218000,
-  //     berat: 2,
-  // }
 
     let {id_user, status_pembayaran, total_pembayaran, berat, detail_transaksi} = req.body
 
@@ -165,6 +150,103 @@ class Transaction {
 
     } catch(err){
       console.log(err)
+    }
+  }
+
+  static async getCityInProvince(req,res,next){
+    const {province} = req.body
+
+    console.log(province)
+
+    try{
+      axios
+        .get(`https://api.rajaongkir.com/starter/city?province=${province}`,{
+          headers: {key: process.env.KEY_RAJA_ONGKIR}
+        })
+        .then(({data}) => {
+            console.log('Result from raja ongkir')
+
+            let arr = data['rajaongkir']['results']
+
+            res.status(200).json({
+              // result,
+              msg: `Fetc City in ${arr[0]['province']}`,
+              result: arr
+            })
+        })
+        .catch(err=>{
+            console.log(err)
+        })
+        .finally(()=>{
+            console.log('Fetch city in province , to raja ongkir API')
+        })
+    }catch(err){
+      next(err)
+    }
+  }
+
+  static async getTypeCourier(req,res,next){
+
+  }
+
+  static async checkOngkir(req,res,next){
+    const {destination, weight, courier} = req.body
+    console.log('Req body :\n', req.body)
+
+    // courier Valid : pos, tiki, jne
+
+    // Origin Kabupaten Bandung City Id : 22
+    // Destination Kabupaten Aceh Barat Daya City Id : 2
+
+
+    // const form = new FormData({
+    //   'destination': destination,
+    //   'origin': 21,
+    //   'weight': weight,
+    //   'courier': courier,
+    // });
+    // form.append('destination', destination)
+    // from.append('origin', origin)
+    // from.append('weight', weight)
+    // from.append('courier', courier)
+
+
+
+
+    try{
+      axios
+        .post('https://api.rajaongkir.com/starter/cost', {
+          'destination': destination,
+          'origin': 22,
+          'weight': weight,
+          'courier': courier,
+        }, {
+          headers: {key: process.env.KEY_RAJA_ONGKIR},
+        })
+        .then(({data}) => {
+            console.log('Success get Raja Ongkir cost', data['rajaongkir']['results'])
+
+            res.status(200).json({
+              msg: 'OKE',
+
+              rajaongkir: data['rajaongkir'],
+              results : data['rajaongkir']['results']
+
+            })
+        })
+        .catch(err=>{
+            console.log(err)
+            // res.status(400).json({
+            //   msg: 'Oke Failed'
+            // })
+        })
+        .finally(()=>{
+            console.log('Fetch to raja ongkir API For Check Cost')
+        })
+
+    }catch(err){
+      console.log(err)
+      next(err)
     }
   }
 }
