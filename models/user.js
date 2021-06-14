@@ -34,6 +34,8 @@ let userSchema = new Schema({
         label_alamat:  String,
         nama_penerima: String,
         nomor_telepon:   Number,
+        provinsi: String,
+        kabupaten: String,
         kota_kecamatan: String,
         kode_pos: Number,
         alamat: String}

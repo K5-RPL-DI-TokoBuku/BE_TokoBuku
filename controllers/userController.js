@@ -205,7 +205,7 @@ class UserController {
 
   static async updateAddresUser(req,res,next){
     const {email} = req.userLogin
-    const { label_alamat, nama_penerima,nomor_telepon,kota_kecamatan,kode_pos,alamat } = req.body 
+    const { label_alamat, nama_penerima,nomor_telepon,kota_kecamatan,kode_pos,alamat, provinsi, kabupaten } = req.body 
     console.log('Reques from Body :\n', req.body)
     console.log(`Email From User Login : ${email}`)
 
@@ -215,7 +215,9 @@ class UserController {
       nomor_telepon,
       kota_kecamatan,
       kode_pos,
-      alamat
+      alamat,
+      provinsi,
+      kabupaten,
     }
     
     try{     

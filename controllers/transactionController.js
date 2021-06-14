@@ -7,12 +7,14 @@ let core = new midtransClient.CoreApi({
 });
 
 const {transaksi} = require('../models/transaksi');
+const {user} = require('../models/user')
 
 const axios = require('axios');
 const FormData = require('form-data');
 
 class Transaction {
   static async sendChargeRequestToMidtrans(req, res, next) {
+
     console.log("Server Key:", `${process.env.YOUR_SERVER_KEY}`);
     let {payment_type, email, gross_amount, order_id} = req.body
 
@@ -27,9 +29,9 @@ class Transaction {
       },
       customer_details: {
         email,
-        first_name: "ichlasul",
-        last_name: "amal",
-        phone: "+6282 3620 97321",
+        first_name,
+        last_name,
+        phone,
       },
       item_details: [
         {
@@ -88,21 +90,40 @@ class Transaction {
 
   static async createTransaksi(req,res,next){
 
-    let {id_user, status_pembayaran, total_pembayaran, berat, detail_transaksi} = req.body
+    // Bikin database transaksi
+    // Update detail pembayaran
+
+    console.log(req.body)
+
+    let {id_user, total_pembayaran, berat, detail_transaksi} = req.body
 
     let post_data = {
       id_user, 
-      status_pembayaran, 
       total_pembayaran, 
       berat, 
-      detail_transaksi
+      detail_transaksi,
+      kurir: {
+        name_courier,
+        service,
+        description,
+        costValue,
+        costEtd,
+      }
     }
 
     try {
       const new_transaksi = await transaksi.create(post_data)
-      res.status(201).json({
-        message: 'Success Create transaksi'
-      })
+
+      if(new_transaksi){
+        console.log('Transaksi Created >>>')
+        res.status(201).json({
+          message: 'Success Create transaksi',
+          new_transaksi
+        })
+      } else {
+
+      }
+      
 
     } catch(err) {
       next(err)
@@ -243,6 +264,110 @@ class Transaction {
         .finally(()=>{
             console.log('Fetch to raja ongkir API For Check Cost')
         })
+
+    }catch(err){
+      console.log(err)
+      next(err)
+    }
+  }
+
+  static async buatTransaksi(req, res,next){
+    const {userData, products, courier, ongkir, pembayaran, total_pembayaran } = req.body
+
+    // Define Variabel
+    let dataTransaksi = {
+      id_user: userData['_id'],
+      total_pembayaran,
+      berat: 2,
+      detail_transaksi:products,
+      detail_status_pembayaran:{},
+      kurir: courier
+    }
+
+    try {
+
+      // Step 1 Create Transaksi In DB
+      const newTransaksi = await transaksi.create(dataTransaksi)
+
+      if (newTransaksi){
+        console.log("New transaksi: \n", newTransaksi)
+      } else {
+        console.log("Transaksi Error")
+      }
+
+      // Step 2 Create Pembayaran To Midtrans
+      let dataPayment = {
+        payment_type: pembayaran['paymentType']['type'].toLowerCase().split(" ").join("_"),
+        transaction_details: {
+          order_id: newTransaksi['_id'],
+          gross_amount: total_pembayaran
+        },
+        bank_transfer: {
+          "bank": pembayaran['paymentChannel']['title']
+        }
+      }
+
+      console.log("Data Payment :\n", dataPayment)
+
+      const newPayment = await core.charge(dataPayment)
+
+      if(newPayment){
+        console.log("New Payment :\n", newPayment)
+      } else {
+        console.log("New Payment Error")
+      }
+
+      // Step 3 Update DB with midtrans Result
+      const {transaction_id, order_id, merchant_id, gross_amount, currency, payment_type, transaction_time, transaction_status, va_numbers, fraud_status} = newPayment
+      const detail_status_pembayaran = {
+        transaction_id, order_id, merchant_id, gross_amount, currency, payment_type, transaction_time, transaction_status, va_numbers, fraud_status
+      }
+      const id_transaksi = newTransaksi._id
+
+      console.log("ID transaksi : ", id_transaksi)
+      console.log("Detail status pembayaran : \n", detail_status_pembayaran)
+
+      const updateTransaksi = await transaksi.findOneAndUpdate(
+        {_id: id_transaksi},
+        {detail_status_pembayaran},
+        {returnOriginal: false}
+      )
+
+      if (updateTransaksi){
+        console.log("Updated transaksi : \n", updateTransaksi)
+      } else {
+        console.log('Update transaksi gagal')
+      }
+
+      // Step 4 Update Cart User 
+
+      if (newTransaksi && newPayment && updateTransaksi){
+        const updateUserCart = await user.findOneAndUpdate(
+          {email : userData['email']},
+          {cart: []},
+          {returnOriginal: false}
+        )
+  
+        if (updateUserCart){
+          console.log("Update user cart:\n", updateUserCart)
+        } else {
+          console.log("Update user cart failed")
+        }
+      }
+
+      // Step 5 Send Result To User
+      if (newTransaksi && newPayment && updateTransaksi){
+
+        const va_numbers = detail_status_pembayaran['va_numbers'][0]
+        res.status(200).json({
+          msg: 'oke Iklas',
+          bank : va_numbers['bank'],
+          va: va_numbers['va_number'],
+        })
+      } else {
+        console.log("Error : Failed to create transaction user!")
+        throw({name: 'Failed to create transaction user!'})
+      }
 
     }catch(err){
       console.log(err)

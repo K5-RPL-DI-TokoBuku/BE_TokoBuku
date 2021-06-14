@@ -12,4 +12,6 @@ router.post('/get_city_in_province', TransactionController.getCityInProvince);
 
 router.post('/check_ongkir', TransactionController.checkOngkir);
 
+router.post('/buat_transaksi', TransactionController.buatTransaksi);
+
 module.exports = router;
