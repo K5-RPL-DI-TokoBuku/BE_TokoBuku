@@ -131,10 +131,15 @@ class Transaction {
   }
 
   static async readTransactions(req,res,next){
+    console.log('Hello Iklas')
+
+    const id_user = req.userLogin['_id']
+    console.log("ID: ", id_user)
     try {
-      const all = await transaksi.find({})
+      const all = await transaksi.find({id_user})
       res.status(200).json({
         msg: 'Find All transaksi',
+        total: all.length,
         response: all
       })
     } catch(err){
@@ -374,6 +379,8 @@ class Transaction {
       next(err)
     }
   }
+
+  
 }
 
 module.exports = Transaction;
