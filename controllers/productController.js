@@ -89,13 +89,14 @@ class ProductController {
   static async updateProduct(req, res, next) {
     const id = req.params.id
     let { name, author, category, image_link, price, quantity, description } = req.body
+    console.log("ID klas: ", id)
 
     if ( !name && !author && !category && !image_link && !price && !quantity && !description){
       throw({name: "Inputan Not valid"})
-
     }
+
     try{
-      const update = await product.findOneAndUpdate(id, { name, author, category, image_link, price, quantity, description }, {})
+      const update = await product.findOneAndUpdate({_id: id}, { name, author, category, image_link, price, quantity, description })
       if (update ){
         res.status(200).json({
           message: "Success Update"
