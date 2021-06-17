@@ -144,6 +144,31 @@ class Transaction {
       })
     } catch(err){
       console.log(err)
+      next(err)
+    }
+  }
+
+  static async newReadTransactions(req,res,next){
+    console.log('Hello ')
+    const id_user = req.userLogin['_id']
+    console.log('Id User : ', id_user)
+  
+    try {
+      const all = await transaksi.find({})
+      console.log("all", all)
+      
+
+      if (all){
+        res.status(200).json({
+          msg : ' Find All Transaksi By Admin : OK',
+          response: all
+        })
+      } else {
+        console.log('All not found')
+      }
+    } catch(err){
+      console.log('Kena Catch')
+      next(err)
     }
   }
 

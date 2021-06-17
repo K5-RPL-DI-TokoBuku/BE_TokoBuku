@@ -3,6 +3,7 @@ const router = express.Router();
 const TransactionController = require("../controllers/transactionController");
 const { authentication, isAdmin } = require('../midlewares/auth')
 
+router.get('/all', authentication, TransactionController.newReadTransactions);
 
 router.post("/charge", TransactionController.sendChargeRequestToMidtrans);
 router.post("/createTransaksi", TransactionController.createTransaksi);
@@ -14,5 +15,7 @@ router.post('/get_city_in_province', TransactionController.getCityInProvince);
 router.post('/check_ongkir', TransactionController.checkOngkir);
 
 router.post('/buat_transaksi', TransactionController.buatTransaksi);
+
+
 
 module.exports = router;
