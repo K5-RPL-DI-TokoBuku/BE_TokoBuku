@@ -65,17 +65,13 @@ class UserController {
   }
 
   static async postLogin(req, res, next) {
-
-    // console.log(req.body)
-    // res.status(200).json({
-    //   msg: 'ok'
-    // })
     let { email, password } = req.body;
     try {
 
       const userExist = await user.findOne({email})
-      // console.log(userExist.password)
-      // console.log('45')
+
+
+      console.log("User:", userExist)
 
 
 
@@ -99,10 +95,8 @@ class UserController {
         throw { name: "User doesnt exist or wrong password" };
       }
 
-
-
-
     } catch (err) {
+      console.log("Kampret luklas")
       next(err);
     }
   }
